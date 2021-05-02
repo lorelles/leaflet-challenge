@@ -49,12 +49,35 @@ function createFeatures(earthquakeData) {
     // Run the onEachFeature function once for each piece of data in the array
     const earthquakes = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature,
+        style: function(feature) {
+            console.log(feature.geometry.coordinates[2]);
+            var mag = feature.properties.mag;
+            if (mag >= 4.0) {
+              return {
+                color: "red"
+              }; 
+            }
+            else if (mag >= 3.0) {
+              return {
+                color: "orange"
+              };
+            } else if (mag >= 2.0) {
+              return {
+                color: "yellow"
+              };
+            } else {
+              return {
+                color: "green"
+              }
+            }
+          },
         pointToLayer: (feature, latlng) => {
             return new L.Circle(latlng, {
                 radius: feature.properties.mag * 50000,
                 // fillColor: "red",
                 // fillColor: markerLayer,
-                stroke: false
+                stroke: false,
+                
             });
         }
     });
