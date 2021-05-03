@@ -50,40 +50,83 @@ function createFeatures(earthquakeData) {
     const earthquakes = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature,
         style: function(feature) {
-            console.log(feature.geometry.coordinates[2]);
-            var mag = feature.properties.mag;
-            if (mag >= 4.0) {
+            // console.log(feature.geometry.coordinates[2]);
+            var depth = feature.geometry.coordinates[2];
+            if (depth >= 91) {
               return {
-                color: "red"
+                color: '#bd0026'
               }; 
             }
-            else if (mag >= 3.0) {
+            else if (depth >= 71) {
               return {
-                color: "orange"
+                color: '#e31a1c'
               };
-            } else if (mag >= 2.0) {
+            } else if (depth >= 51) {
               return {
-                color: "yellow"
+                color: '#fc4e2a'
               };
+            } else if (depth >= 31) {
+                return {
+                  color: '#fd8d3c'
+                };
+            } else if (depth >= 11) {
+                    return {
+                      color: '#feb24c'
+                    };
+                } else if (depth >= -10) {
+                    return {
+                      color: '#ffeda0'
+                    };
             } else {
               return {
-                color: "green"
+                color: '#969696'
               }
             }
           },
         pointToLayer: (feature, latlng) => {
             return new L.Circle(latlng, {
                 radius: feature.properties.mag * 50000,
-                // fillColor: "red",
-                // fillColor: markerLayer,
-                stroke: false,
-                
+                stroke: true         
             });
         }
     });
 
     const mags = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature,
+        style: function(feature) {
+            // console.log(feature.geometry.coordinates[2]);
+            var depth = feature.geometry.coordinates[2];
+            if (depth >= 91) {
+              return {
+                color: '#bd0026'
+              }; 
+            }
+            else if (depth >= 71) {
+              return {
+                color: '#e31a1c'
+              };
+            } else if (depth >= 51) {
+              return {
+                color: '#fc4e2a'
+              };
+            } else if (depth >= 31) {
+                return {
+                  color: '#fd8d3c'
+                };
+            } else if (depth >= 11) {
+                    return {
+                      color: '#feb24c'
+                    };
+                } else if (depth >= -10) {
+                    return {
+                      color: '#ffeda0'
+                    };
+            } else {
+              return {
+                color: '#969696'
+              }
+            }
+          },
         pointToLayer: (feature, latlng) => {
             return new L.Circle(latlng, {
                 radius: feature.properties.mag * 50000,
@@ -114,7 +157,7 @@ function createMap(earthquakes, mags) {
         tileSize: 512,
         maxZoom: 18,
         zoomOffset: -1,
-        id: "mapbox/streets-v11",
+        id: "mapbox/light-v9",
         accessToken: API_KEY
     });
 
@@ -152,9 +195,6 @@ function createMap(earthquakes, mags) {
     //     };
     // }
 
-    // L.geoJson(earthquakeData, {style: style}).addTo(myMap);
-
-
     // Create a layer control, add our overlay layers to it (Leafletjs.com)
     // Pass in our baseMaps and overlayMaps
     L.control.layers(baseMaps, overlayMaps, {
@@ -162,13 +202,13 @@ function createMap(earthquakes, mags) {
     }).addTo(myMap);
 
     function getColor(d) {
-        return d > 90 ? '#800026' :
-            d > 70 ? '#E31A1C' :
-                d > 50 ? '#FC4E2A' :
-                    d > 30 ? '#FD8D3C' :
-                        d > 10 ? '#FED976' :
-                            d > -10 ? '#FFEDA0' :
-                                '#FFEDA0';
+        return d >= 91 ? '#bd0026' :
+            d >= 71 ? '#e31a1c' :
+                d >= 51 ? '#fc4e2a' :
+                    d >= 31 ? "#fd8d3c" :
+                        d >= 11 ? '#feb24c' :
+                            d >= -10 ? '#ffeda0' :
+                                '#969696';
     }
 
 
