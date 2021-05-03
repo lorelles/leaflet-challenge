@@ -14,19 +14,18 @@
 //     createFeatures(data.features);
 // });
 
-function createFeatures(earthquakeData, platedata) {
+// Define a function we want to run once for each feature in the features array
+function createFeatures(data, platedata) {
 
-    // Define a function we want to run once for each feature in the features array
     // Give each feature a popup describing the place and time of the earthquake
     function onEachFeature(feature, layer) {
         layer.bindPopup("<h4>" + "Magnitude/Location:  " + feature.properties.title +
             "</h4><hr><p>" + "Day/Time:  " + new Date(feature.properties.time) + "</p><hr><p>" + "Depth:  " + feature.geometry.coordinates + "</p>");
-    }
-  
+    } 
 
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
-    const earthquakes = L.geoJSON(earthquakeData, {
+    const earthquakes = L.geoJSON(data, {
         onEachFeature: onEachFeature,
         style: function(feature) {
             // console.log(feature.geometry.coordinates[2]);
@@ -64,29 +63,23 @@ function createFeatures(earthquakeData, platedata) {
           },
         pointToLayer: (feature, latlng) => {
             return new L.Circle(latlng, {
-                radius: feature.properties.mag * 50000,
+                radius: Math.round(feature.properties.mag) * 50000,
                 stroke: true         
             });
         }
     });
 
-    const mags = L.geoJSON(platedata, {
+    const plates = L.geoJSON(platedata, {
         onEachFeature: onEachFeature,
-
-        // pointToLayer: (feature, latlng) => {
-        //     return new L.Circle(latlng, {
-        //         radius: feature.properties.mag * 50000,
-        //         fillColor: "red",
-        //         stroke: false
-        //     });
-        // }
+        color: "orange",
+        weight: 2
     });
 
     // Sending our earthquakes layer to the createMap function
-    createMap(earthquakes, mags);
+    createMap(earthquakes, plates);
 }
 
-function createMap(earthquakes, mags) {
+function createMap(earthquakes, plates) {
 
     // Define satelite map and street map layers
     const satmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -98,7 +91,7 @@ function createMap(earthquakes, mags) {
         accessToken: API_KEY
     });
 
-    const streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    const greyscale = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
         attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
         tileSize: 512,
         maxZoom: 18,
@@ -107,16 +100,26 @@ function createMap(earthquakes, mags) {
         accessToken: API_KEY
     });
 
+    const streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+        attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+        tileSize: 512,
+        maxZoom: 18,
+        zoomOffset: -1,
+        id: "mapbox/streets-v11",
+        accessToken: API_KEY
+    });
+
     // Define a baseMaps object to hold our base layers
     const baseMaps = {
         "Satelite": satmap,
+        "Greyscale": greyscale,
         "Street": streetmap
     };
 
     // Create overlay object to hold our overlay layer
     const overlayMaps = {
         Earthquakes: earthquakes,
-        Magnitudes: mags
+        "Tectonic Plates": plates
     };
 
     // Create our map, giving it the satmap and earthquakes layers to display on load
@@ -124,8 +127,8 @@ function createMap(earthquakes, mags) {
         center: [
             37.09, -95.71
         ],
-        zoom: 4,
-        layers: [satmap, earthquakes]
+        zoom: 2.5,
+        layers: [satmap, earthquakes, plates]
     });
 
 
